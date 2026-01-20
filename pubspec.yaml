@@ -1,0 +1,42 @@
+name: advisor_mate
+description: AdvisorMate - Mobile App für Finanzberater mit DSGVO-Compliance
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  
+  # Biometric Authentication (GDPR Security)
+  local_auth: ^2.1.8
+  
+  # Encryption for sensitive data
+  encrypt: ^5.0.3
+  flutter_secure_storage: ^9.0.0
+  
+  # HTTP Client for Market Data API
+  dio: ^5.4.0
+  
+  # Document Scanning (Placeholder)
+  camerawesome: ^2.0.0-dev.1
+  
+  # UI Helpers
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  riverpod_generator: ^2.3.9
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
