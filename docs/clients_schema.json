@@ -1,0 +1,186 @@
+[
+    {
+        "name": "clients",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "system": false,
+                "id": "fn_tx",
+                "name": "firstName",
+                "type": "text",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": 2,
+                    "max": 100,
+                    "pattern": ""
+                }
+            },
+            {
+                "system": false,
+                "id": "ln_tx",
+                "name": "lastName",
+                "type": "text",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": 2,
+                    "max": 255,
+                    "pattern": ""
+                }
+            },
+            {
+                "system": false,
+                "id": "em_tx",
+                "name": "email",
+                "type": "email",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "exceptDomains": null,
+                    "onlyDomains": null
+                }
+            },
+            {
+                "system": false,
+                "id": "db_dt",
+                "name": "dateOfBirth",
+                "type": "date",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "system": false,
+                "id": "fb_js",
+                "name": "financialBalance",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSize": 2000000
+                }
+            },
+            {
+                "system": false,
+                "id": "lq_js",
+                "name": "liquidity",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSize": 2000000
+                }
+            },
+            {
+                "system": false,
+                "id": "rp_num",
+                "name": "riskProfile",
+                "type": "number",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": 1,
+                    "max": 10,
+                    "noDecimal": true
+                }
+            },
+            {
+                "system": false,
+                "id": "ig_sel",
+                "name": "investmentGoal",
+                "type": "select",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "retirement",
+                        "real_estate",
+                        "wealth_preservation",
+                        "wealth_building",
+                        "income_generation"
+                    ]
+                }
+            },
+            {
+                "system": false,
+                "id": "el_sel",
+                "name": "experienceLevel",
+                "type": "select",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "none",
+                        "basic",
+                        "intermediate",
+                        "experienced",
+                        "expert"
+                    ]
+                }
+            },
+            {
+                "system": false,
+                "id": "ip_num",
+                "name": "investmentHorizonYears",
+                "type": "number",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": 1,
+                    "max": 100,
+                    "noDecimal": true
+                }
+            },
+            {
+                "system": false,
+                "id": "ts_tx",
+                "name": "taxStatus",
+                "type": "text",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "system": false,
+                "id": "es_js",
+                "name": "esgPreferences",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSize": 2000000
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    }
+]
