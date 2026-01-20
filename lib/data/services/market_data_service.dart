@@ -1,9 +1,11 @@
 /// AdvisorMate - Market Data Service
-/// 
+///
 /// Platzhalter für die Anbindung an Marktdaten-APIs (z.B. Yahoo Finance).
 /// Liefert Aktienkurse, Indizes und Marktübersichten.
 
 library;
+
+import 'dart:math';
 
 /// Marktdaten für ein Wertpapier
 class MarketQuote {
@@ -35,14 +37,17 @@ class MarketQuote {
 
   bool get isPositive => change >= 0;
 
-  /// Erstellt ein MarketQuote aus Yahoo Finance API Response
-  factory MarketQuote.fromYahooFinance(Map<String, dynamic> json) {
-    // TODO: Implementierung basierend auf Yahoo Finance API Struktur
-    throw UnimplementedError('Yahoo Finance parsing not implemented');
-  }
-
   @override
-  String toString() => '$symbol: ${currentPrice.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)';
+  String toString() =>
+      '$symbol: ${currentPrice.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)';
+}
+
+/// Datenpunkt für Historische Daten
+class HistoricalPoint {
+  final DateTime date;
+  final double value;
+
+  const HistoricalPoint(this.date, this.value);
 }
 
 /// Index-Übersicht (DAX, S&P 500, etc.)
@@ -67,8 +72,6 @@ class MarketIndex {
 }
 
 /// Service für Marktdaten-Abruf
-/// 
-/// Platzhalter-Implementierung für Yahoo Finance API Anbindung.
 abstract class MarketDataService {
   /// Lädt aktuelle Quote für ein Symbol
   Future<MarketQuote> getQuote(String symbol);
@@ -79,48 +82,12 @@ abstract class MarketDataService {
   /// Lädt die wichtigsten Markt-Indizes
   Future<List<MarketIndex>> getMajorIndices();
 
+  /// Lädt historische Daten für ein Symbol
+  Future<List<HistoricalPoint>> getHistoricalData(String symbol,
+      {required Duration duration});
+
   /// Sucht nach Wertpapieren
   Future<List<MarketQuote>> searchSecurities(String query);
-}
-
-/// Yahoo Finance API Implementierung (Platzhalter)
-/// 
-/// TODO: Implementierung mit dio für HTTP-Requests
-/// API Endpoint: https://query1.finance.yahoo.com/v8/finance/chart/{symbol}
-class YahooFinanceService implements MarketDataService {
-  // final Dio _dio;
-  
-  static const String _baseUrl = 'https://query1.finance.yahoo.com/v8/finance';
-
-  YahooFinanceService();
-  // YahooFinanceService() : _dio = Dio(BaseOptions(baseUrl: _baseUrl));
-
-  @override
-  Future<MarketQuote> getQuote(String symbol) async {
-    // TODO: Implementierung
-    // final response = await _dio.get('/chart/$symbol');
-    // return MarketQuote.fromYahooFinance(response.data);
-    throw UnimplementedError('Yahoo Finance Integration pending');
-  }
-
-  @override
-  Future<List<MarketQuote>> getQuotes(List<String> symbols) async {
-    // TODO: Parallel-Abruf mehrerer Symbole
-    throw UnimplementedError('Yahoo Finance Integration pending');
-  }
-
-  @override
-  Future<List<MarketIndex>> getMajorIndices() async {
-    // Standard-Indizes: DAX, S&P 500, NASDAQ, EURO STOXX 50
-    // TODO: Implementierung
-    throw UnimplementedError('Yahoo Finance Integration pending');
-  }
-
-  @override
-  Future<List<MarketQuote>> searchSecurities(String query) async {
-    // TODO: Yahoo Finance Autosuggest API
-    throw UnimplementedError('Yahoo Finance Integration pending');
-  }
 }
 
 /// Mock-Service für Entwicklung und Tests
@@ -173,6 +140,37 @@ class MockMarketDataService implements MarketDataService {
         timestamp: DateTime.now(),
       ),
     ];
+  }
+
+  @override
+  Future<List<HistoricalPoint>> getHistoricalData(String symbol,
+      {required Duration duration}) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final random = Random(symbol.hashCode);
+    final points = <HistoricalPoint>[];
+    final now = DateTime.now();
+
+    // Startwert basierend auf aktuellem Mock-Wert
+    double currentValue = 100.0;
+    if (symbol == '^GDAXI') currentValue = 18542.75;
+    if (symbol == '^GSPC') currentValue = 5234.18;
+    if (symbol == '^STOXX50E') currentValue = 4892.45;
+
+    // Rückwärts generieren
+    final days = duration.inDays;
+    final interval =
+        days > 30 ? 7 : 1; // Wöchentlich bei 1 Jahr, täglich bei 1 Monat
+
+    for (int i = days; i >= 0; i -= interval) {
+      final date = now.subtract(Duration(days: i));
+      // Random Walk: +/- 1% pro Schritt
+      final change = (random.nextDouble() - 0.5) * 0.02;
+      currentValue = currentValue * (1 + change);
+      points.add(HistoricalPoint(date, currentValue));
+    }
+
+    return points;
   }
 
   @override

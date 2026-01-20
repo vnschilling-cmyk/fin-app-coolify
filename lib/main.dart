@@ -1,4 +1,4 @@
-/// AdvisorMate - Mobile App für Finanzberater
+/// NoScConsult - Mobile App für Finanzberater
 ///
 /// Haupteinstiegspunkt der Anwendung.
 ///
@@ -65,7 +65,7 @@ class AdvisorMateApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-      title: 'AdvisorMate',
+      title: 'NoScConsult',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
       darkTheme: _buildDarkTheme(),
@@ -80,30 +80,44 @@ class AdvisorMateApp extends ConsumerWidget {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF1A5F7A), // Fintech Blue
+        seedColor: const Color(0xFF007BFF), // NoSc Blue
         brightness: Brightness.light,
+        surface: const Color(0xFFFCFCFD), // Fresher white
       ),
+      scaffoldBackgroundColor: const Color(0xFFF8F9FA), // Very light grey
       appBarTheme: const AppBarTheme(
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF1A1C1E),
       ),
       cardTheme: CardThemeData(
-        elevation: 2,
+        elevation: 0.5,
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFF1F3F5), width: 1),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE9ECEF)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE9ECEF)),
         ),
         filled: true,
+        fillColor: Colors.white,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
       ),
     );

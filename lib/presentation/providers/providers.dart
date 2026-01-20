@@ -84,6 +84,14 @@ final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
   return await marketService.getMajorIndices();
 });
 
+/// Historische Daten für Markt-Indizes (1 Jahr)
+final historicalMarketDataProvider =
+    FutureProvider.family<List<HistoricalPoint>, String>((ref, symbol) async {
+  final marketService = ref.watch(marketDataServiceProvider);
+  return await marketService.getHistoricalData(symbol,
+      duration: const Duration(days: 365));
+});
+
 // ========== NOTIFIERS ==========
 
 /// Notifier für Client-Liste mit CRUD-Operationen

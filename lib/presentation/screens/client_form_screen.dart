@@ -24,6 +24,7 @@ class ClientFormScreen extends ConsumerStatefulWidget {
 class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
+  bool _isSubmitting = false;
 
   // Controllers - Basisdaten
   final _firstNameController = TextEditingController();
@@ -83,58 +84,79 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
   }
 
   void _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_isSubmitting) return;
 
-    final newClient = Client(
-      id: widget.initialClient?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
-      firstName: _firstNameController.text,
-      lastName: _lastNameController.text,
-      email: _emailController.text,
-      dateOfBirth: _dateOfBirth,
-      financialBalance: FinancialBalance(
-        assets: [
-          Asset(
-              id: '1',
-              name: 'Gesamtvermögen',
-              type: AssetType.cash,
-              value: double.parse(_assetsController.text))
-        ],
-        liabilities: [
-          Liability(
-              id: '1',
-              name: 'Verbindlichkeiten',
-              type: LiabilityType.other,
-              amount: double.parse(_liabilitiesController.text),
-              interestRate: 0)
-        ],
-      ),
-      liquidity: Liquidity(
-        monthlyIncome: double.parse(_incomeController.text),
-        monthlyExpenses: double.parse(_expensesController.text),
-      ),
-      taxStatus: TaxStatus.residentTaxable,
-      riskProfile: _riskProfile,
-      investmentGoal: _goal,
-      experienceLevel: _experience,
-      investmentHorizonYears: _horizon,
-      esgPreferences: EsgPreferences(
-        prefersArticle8: _prefersArt8,
-        prefersArticle9: _prefersArt9,
-      ),
-      createdAt: widget.initialClient?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-
-    // Save via Provider
-    await ref.read(clientsNotifierProvider.notifier).addClient(newClient);
-
-    if (mounted) {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Kunde erfolgreich gespeichert (verschlüsselt)')),
+        const SnackBar(content: Text('Bitte alle Felder korrekt ausfüllen.')),
       );
-      Navigator.pop(context);
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final newClient = Client(
+        id: widget.initialClient?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        email: _emailController.text,
+        dateOfBirth: _dateOfBirth,
+        financialBalance: FinancialBalance(
+          assets: [
+            Asset(
+                id: '1',
+                name: 'Gesamtvermögen',
+                type: AssetType.cash,
+                value: double.tryParse(_assetsController.text) ?? 0)
+          ],
+          liabilities: [
+            Liability(
+                id: '1',
+                name: 'Verbindlichkeiten',
+                type: LiabilityType.other,
+                amount: double.tryParse(_liabilitiesController.text) ?? 0,
+                interestRate: 0)
+          ],
+        ),
+        liquidity: Liquidity(
+          monthlyIncome: double.tryParse(_incomeController.text) ?? 0,
+          monthlyExpenses: double.tryParse(_expensesController.text) ?? 0,
+        ),
+        taxStatus: TaxStatus.residentTaxable,
+        riskProfile: _riskProfile,
+        investmentGoal: _goal,
+        experienceLevel: _experience,
+        investmentHorizonYears: _horizon,
+        esgPreferences: EsgPreferences(
+          prefersArticle8: _prefersArt8,
+          prefersArticle9: _prefersArt9,
+        ),
+        createdAt: widget.initialClient?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      // Save via Provider
+      await ref.read(clientsNotifierProvider.notifier).addClient(newClient);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text('Kunde erfolgreich gespeichert!')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text('Fehler beim Speichern: $e')),
+        );
+      }
     }
   }
 
@@ -146,45 +168,86 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
             ? 'Neuer Kunde (KYC)'
             : 'KYC bearbeiten'),
       ),
-      body: Form(
-        key: _formKey,
-        child: Stepper(
-          type: StepperType.horizontal,
-          currentStep: _currentStep,
-          onStepContinue: () {
-            if (_currentStep < 3) {
-              setState(() => _currentStep++);
-            } else {
-              _submit();
-            }
-          },
-          onStepCancel: () {
-            if (_currentStep > 0) {
-              setState(() => _currentStep--);
-            }
-          },
-          steps: [
-            Step(
-              title: const Text('Basis'),
-              isActive: _currentStep >= 0,
-              content: _buildBasisStep(),
-            ),
-            Step(
-              title: const Text('Finanzen'),
-              isActive: _currentStep >= 1,
-              content: _buildFinanceStep(),
-            ),
-            Step(
-              title: const Text('Risiko'),
-              isActive: _currentStep >= 2,
-              content: _buildRiskStep(),
-            ),
-            Step(
-              title: const Text('ESG'),
-              isActive: _currentStep >= 3,
-              content: _buildEsgStep(),
-            ),
-          ],
+      body: AbsorbPointer(
+        absorbing: _isSubmitting,
+        child: Form(
+          key: _formKey,
+          child: Stepper(
+            type: StepperType.horizontal,
+            currentStep: _currentStep,
+            onStepContinue: () {
+              // Validierung des aktuellen Steps vor dem Weitergehen
+              if (_formKey.currentState!.validate()) {
+                if (_currentStep < 3) {
+                  setState(() => _currentStep++);
+                } else {
+                  _submit();
+                }
+              }
+            },
+            onStepCancel: () {
+              if (_currentStep > 0) {
+                setState(() => _currentStep--);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            controlsBuilder: (context, details) {
+              final isLastStep = _currentStep == 3;
+              return Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: details.onStepContinue,
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(isLastStep ? 'Speichern' : 'Weiter'),
+                    ),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: details.onStepCancel,
+                      child: Text(_currentStep == 0 ? 'Abbrechen' : 'Zurück'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            steps: [
+              Step(
+                title: const Text('Basis'),
+                isActive: _currentStep >= 0,
+                state:
+                    _currentStep > 0 ? StepState.complete : StepState.indexed,
+                content: _buildBasisStep(),
+              ),
+              Step(
+                title: const Text('Finanzen'),
+                isActive: _currentStep >= 1,
+                state:
+                    _currentStep > 1 ? StepState.complete : StepState.indexed,
+                content: _buildFinanceStep(),
+              ),
+              Step(
+                title: const Text('Risiko'),
+                isActive: _currentStep >= 2,
+                state:
+                    _currentStep > 2 ? StepState.complete : StepState.indexed,
+                content: _buildRiskStep(),
+              ),
+              Step(
+                title: const Text('ESG'),
+                isActive: _currentStep >= 3,
+                state:
+                    _currentStep == 3 ? StepState.editing : StepState.indexed,
+                content: _buildEsgStep(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -209,7 +272,11 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
           controller: _emailController,
           decoration: const InputDecoration(labelText: 'E-Mail'),
           keyboardType: TextInputType.emailAddress,
-          validator: (v) => v!.isEmpty ? 'Erforderlich' : null,
+          validator: (v) {
+            if (v!.isEmpty) return 'Erforderlich';
+            if (!v.contains('@')) return 'Ungültiges Format';
+            return null;
+          },
         ),
       ],
     );
@@ -233,7 +300,12 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: label, suffixText: '€'),
-      keyboardType: TextInputType.number,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      validator: (v) {
+        if (v == null || v.isEmpty) return 'Erforderlich';
+        if (double.tryParse(v) == null) return 'Nur Zahlen erlaubt';
+        return null;
+      },
     );
   }
 
@@ -253,7 +325,8 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
         const SizedBox(height: 16),
         const Text('Anlageziel'),
         DropdownButtonFormField<InvestmentGoal>(
-          initialValue: _goal,
+          value: _goal,
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           items: InvestmentGoal.values
               .map(
                   (g) => DropdownMenuItem(value: g, child: Text(g.displayName)))
@@ -263,7 +336,8 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
         const SizedBox(height: 16),
         const Text('Erfahrungshorizont'),
         DropdownButtonFormField<ExperienceLevel>(
-          initialValue: _experience,
+          value: _experience,
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           items: ExperienceLevel.values
               .map(
                   (e) => DropdownMenuItem(value: e, child: Text(e.displayName)))

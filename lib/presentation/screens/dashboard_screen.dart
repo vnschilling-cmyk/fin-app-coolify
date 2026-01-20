@@ -13,6 +13,7 @@ import 'package:advisor_mate/presentation/providers/providers.dart';
 import 'package:advisor_mate/presentation/screens/client_detail_screen.dart';
 import 'package:advisor_mate/presentation/screens/client_form_screen.dart';
 import 'package:advisor_mate/presentation/screens/calculator_screen.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:advisor_mate/presentation/widgets/document_scan_widget.dart';
 
 /// Haupt-Dashboard für Finanzberater
@@ -23,7 +24,7 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AdvisorMate'),
+        title: const Text('NoScConsult'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -41,8 +42,11 @@ class DashboardScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(clientsProvider);
+          ref.invalidate(clientsNotifierProvider);
           ref.invalidate(marketIndicesProvider);
+          ref.invalidate(historicalMarketDataProvider('^GDAXI'));
+          ref.invalidate(historicalMarketDataProvider('^GSPC'));
+          ref.invalidate(historicalMarketDataProvider('^STOXX50E'));
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -50,8 +54,8 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Marktdaten Widget
-              _MarketDataSection(),
+              // Marktdaten Trend Section
+              _MarketTrendSection(),
               const SizedBox(height: 24),
 
               // Quick Actions
@@ -78,39 +82,42 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-/// Marktdaten-Übersicht
-class _MarketDataSection extends ConsumerWidget {
-  final currencyFormat = NumberFormat.currency(locale: 'de_DE', symbol: '');
-
+/// Marktdaten-Trend (1 Jahr)
+class _MarketTrendSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final indicesAsync = ref.watch(marketIndicesProvider);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Marktübersicht',
-          style: Theme.of(context).textTheme.titleLarge,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Markt-Trend (1 Jahr)',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Row(
+              children: [
+                _LegendItem(label: 'DAX', color: Colors.blue),
+                const SizedBox(width: 8),
+                _LegendItem(label: 'S&P 500', color: Colors.green),
+                const SizedBox(width: 8),
+                _LegendItem(label: 'EuroStoxx', color: Colors.orange),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 120, // Increased from 100 to fix overflow
-          child: indicesAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(
-              child:
-                  Text('Fehler: $e', style: const TextStyle(color: Colors.red)),
-            ),
-            data: (indices) => ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: indices.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final idx = indices[index];
-                return _MarketIndexCard(index: idx);
-              },
-            ),
+        const SizedBox(height: 16),
+        Card(
+          elevation: 0,
+          color: Theme.of(context)
+              .colorScheme
+              .surfaceContainerHighest
+              .withOpacity(0.3),
+          child: Container(
+            height: 250,
+            padding: const EdgeInsets.fromLTRB(8, 24, 24, 8),
+            child: _CombinedMarketChart(),
           ),
         ),
       ],
@@ -118,50 +125,128 @@ class _MarketDataSection extends ConsumerWidget {
   }
 }
 
-class _MarketIndexCard extends StatelessWidget {
-  final MarketIndex index;
+class _LegendItem extends StatelessWidget {
+  final String label;
+  final Color color;
 
-  const _MarketIndexCard({required this.index});
+  const _LegendItem({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final isPositive = index.isPositive;
-    final color = isPositive ? Colors.green : Colors.red;
+    return Row(
+      children: [
+        Container(width: 10, height: 10, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 10)),
+      ],
+    );
+  }
+}
 
-    return Card(
-      child: Container(
-        width: 150,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              index.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              NumberFormat('#,##0.00', 'de_DE').format(index.value),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: 16,
-                  color: color,
+class _CombinedMarketChart extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final daxData = ref.watch(historicalMarketDataProvider('^GDAXI'));
+    final sp500Data = ref.watch(historicalMarketDataProvider('^GSPC'));
+    final stoxxData = ref.watch(historicalMarketDataProvider('^STOXX50E'));
+
+    return daxData.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (dax) => sp500Data.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
+        data: (sp500) => stoxxData.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Fehler: $e')),
+          data: (stoxx) => LineChart(
+            LineChartData(
+              gridData: const FlGridData(show: false),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        '${value.toInt()}%',
+                        style: const TextStyle(fontSize: 9, color: Colors.grey),
+                      );
+                    },
+                  ),
                 ),
-                Text(
-                  '${isPositive ? '+' : ''}${index.changePercent.toStringAsFixed(2)}%',
-                  style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                rightTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 30,
+                    interval: 30, // Show roughly every month
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      if (index >= 0 && index < dax.length) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            DateFormat('MM/yy').format(dax[index].date),
+                            style: const TextStyle(
+                                fontSize: 9, color: Colors.grey),
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    },
+                  ),
                 ),
+              ),
+              borderData: FlBorderData(show: false),
+              lineBarsData: [
+                _generateLine(dax, Colors.blue),
+                _generateLine(sp500, Colors.green),
+                _generateLine(stoxx, Colors.orange),
               ],
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipColor: (_) => Theme.of(context).colorScheme.surface,
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final value = spot.y.toStringAsFixed(1);
+                      return LineTooltipItem(
+                        '$value%',
+                        const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 10),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
             ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  LineChartBarData _generateLine(List<HistoricalPoint> points, Color color) {
+    if (points.isEmpty) return LineChartBarData(spots: [], color: color);
+
+    final startValue = points.first.value;
+
+    return LineChartBarData(
+      spots: points.asMap().entries.map((e) {
+        final normalizedValue = (e.value.value / startValue) * 100;
+        return FlSpot(e.key.toDouble(), normalizedValue);
+      }).toList(),
+      isCurved: true,
+      color: color,
+      barWidth: 2,
+      isStrokeCapRound: true,
+      dotData: const FlDotData(show: false),
+      belowBarData: BarAreaData(
+        show: true,
+        color: color.withOpacity(0.1),
       ),
     );
   }
@@ -231,7 +316,8 @@ class _QuickActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Icon(icon, size: 32, color: Theme.of(context).primaryColor),
+              Icon(icon,
+                  size: 32, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 8),
               Text(label, textAlign: TextAlign.center),
             ],
@@ -248,7 +334,7 @@ class _ClientsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clientsAsync = ref.watch(clientsProvider);
+    final clientsAsync = ref.watch(clientsNotifierProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,5 @@
 /// AdvisorMate - Document Scan Widget
-/// 
+///
 /// UI-Button für Dokumenten-Scan mit Kamera-Integration.
 /// Nutzt camerawesome als Platzhalter für die Implementierung.
 
@@ -8,9 +8,9 @@ library;
 import 'package:flutter/material.dart';
 
 /// Widget für Dokumenten-Scan Funktion
-/// 
+///
 /// Öffnet die Kamera zum Scannen von Dokumenten und generiert ein PDF.
-/// 
+///
 /// HINWEIS: Dies ist ein Platzhalter. Für die vollständige Implementierung:
 /// 1. Füge `camerawesome` oder `edge_detection` zu pubspec.yaml hinzu
 /// 2. Implementiere die Kamera-Capture-Logik
@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 class DocumentScanWidget extends StatelessWidget {
   /// Callback wenn Scan abgeschlossen
   final void Function(String documentPath)? onScanComplete;
-  
+
   /// Callback bei Fehler
   final void Function(String error)? onError;
 
@@ -41,7 +41,7 @@ class DocumentScanWidget extends StatelessWidget {
               Icon(
                 Icons.document_scanner,
                 size: 32,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 8),
               const Text(
@@ -57,7 +57,7 @@ class DocumentScanWidget extends StatelessWidget {
 
   void _startDocumentScan(BuildContext context) {
     // TODO: Implementierung mit camerawesome oder edge_detection
-    // 
+    //
     // Beispiel-Implementierung:
     // ```dart
     // await Navigator.push(
@@ -154,7 +154,8 @@ class _DocumentScanBottomSheet extends StatelessWidget {
                   onPressed: () {
                     // Simuliere einen erfolgreichen Scan
                     Navigator.pop(context);
-                    onScanComplete?.call('/documents/scan_${DateTime.now().millisecondsSinceEpoch}.pdf');
+                    onScanComplete?.call(
+                        '/documents/scan_${DateTime.now().millisecondsSinceEpoch}.pdf');
                   },
                   icon: const Icon(Icons.check),
                   label: const Text('Demo Scan'),
