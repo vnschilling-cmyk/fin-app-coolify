@@ -1,0 +1,106 @@
+[
+    {
+        "id": "advisor_clients",
+        "name": "clients",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "firstName",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": 2,
+                    "max": 100
+                }
+            },
+            {
+                "name": "lastName",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": 2,
+                    "max": 255
+                }
+            },
+            {
+                "name": "email",
+                "type": "email",
+                "required": true
+            },
+            {
+                "name": "dateOfBirth",
+                "type": "date",
+                "required": true
+            },
+            {
+                "name": "financialBalance",
+                "type": "json",
+                "required": false
+            },
+            {
+                "name": "liquidity",
+                "type": "json",
+                "required": false
+            },
+            {
+                "name": "riskProfile",
+                "type": "number",
+                "required": true,
+                "options": {
+                    "min": 1,
+                    "max": 10
+                }
+            },
+            {
+                "name": "investmentGoal",
+                "type": "select",
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "retirement",
+                        "real_estate",
+                        "wealth_preservation",
+                        "wealth_building",
+                        "income_generation"
+                    ]
+                }
+            },
+            {
+                "name": "experienceLevel",
+                "type": "select",
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "none",
+                        "basic",
+                        "intermediate",
+                        "experienced",
+                        "expert"
+                    ]
+                }
+            },
+            {
+                "name": "investmentHorizonYears",
+                "type": "number",
+                "options": {
+                    "min": 1,
+                    "max": 100
+                }
+            },
+            {
+                "name": "taxStatus",
+                "type": "text"
+            },
+            {
+                "name": "esgPreferences",
+                "type": "json"
+            }
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": ""
+    }
+]

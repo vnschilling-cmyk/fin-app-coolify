@@ -23,6 +23,7 @@ class FeatureFlags {
   FeatureFlags._();
   
   /// Biometrische Authentifizierung aktivieren
+  /// TIPP: Für lokales Testen auf Emulatoren ohne Biometrie auf 'false' setzen.
   static const bool biometricAuthEnabled = true;
   
   /// Dokumenten-Scan Feature aktivieren
