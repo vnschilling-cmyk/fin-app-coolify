@@ -40,10 +40,15 @@ void main() async {
   final encryptionUtils = EncryptionUtils();
   await encryptionUtils.initialize();
 
+  // Database initialisieren
+  final pbService = PocketBaseDatabaseService(baseUrl: ApiConstants.pocketBaseUrl);
+  await pbService.initialize();
+
   runApp(
     ProviderScope(
       overrides: [
         encryptionUtilsProvider.overrideWithValue(encryptionUtils),
+        databaseServiceProvider.overrideWithValue(pbService),
       ],
       child: const AdvisorMateApp(),
     ),

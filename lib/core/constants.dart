@@ -8,8 +8,9 @@ library;
 class ApiConstants {
   ApiConstants._();
   
-  /// PocketBase Backend URL - muss für Produktion angepasst werden
-  static const String pocketBaseUrl = 'https://your-pocketbase-instance.com';
+  /// PocketBase Backend URL - muss für Produktion angepasst werden.
+  /// Nutze hier die URL deines Coolify-PocketBase Dienstes.
+  static const String pocketBaseUrl = 'https://pb.your-coolify-domain.com';
   
   /// Yahoo Finance API Platzhalter
   static const String marketDataApiUrl = 'https://query1.finance.yahoo.com/v8/finance/chart';

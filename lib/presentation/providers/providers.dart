@@ -26,10 +26,9 @@ final authServiceProvider = Provider<AuthService>((ref) {
 
 /// Database Service Provider
 /// 
-/// Verwendet MockDatabaseService für Entwicklung.
-/// TODO: Auf PocketBaseDatabaseService wechseln für Produktion.
+/// Nutzt PocketBaseDatabaseService mit der URL aus den Konstanten.
 final databaseServiceProvider = Provider<ClientDatabaseService>((ref) {
-  return MockDatabaseService();
+  return PocketBaseDatabaseService(baseUrl: ApiConstants.pocketBaseUrl);
 });
 
 /// Financial Calculator Provider
