@@ -1,7 +1,7 @@
 /// AdvisorMate - Mobile App für Finanzberater
-/// 
+///
 /// Haupteinstiegspunkt der Anwendung.
-/// 
+///
 /// Features:
 /// - CRM & KYC Management
 /// - Dashboard mit Marktdaten
@@ -18,6 +18,8 @@ import 'package:advisor_mate/core/encryption_utils.dart';
 import 'package:advisor_mate/presentation/providers/providers.dart';
 import 'package:advisor_mate/presentation/screens/dashboard_screen.dart';
 import 'package:advisor_mate/presentation/widgets/biometric_auth_guard.dart';
+import 'package:advisor_mate/core/constants.dart';
+import 'package:advisor_mate/data/services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +43,8 @@ void main() async {
   await encryptionUtils.initialize();
 
   // Database initialisieren
-  final pbService = PocketBaseDatabaseService(baseUrl: ApiConstants.pocketBaseUrl);
+  final pbService =
+      PocketBaseDatabaseService(baseUrl: ApiConstants.pocketBaseUrl);
   await pbService.initialize();
 
   runApp(
@@ -84,7 +87,7 @@ class AdvisorMateApp extends ConsumerWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -117,7 +120,7 @@ class AdvisorMateApp extends ConsumerWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

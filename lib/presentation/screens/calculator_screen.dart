@@ -1,5 +1,5 @@
 /// AdvisorMate - Calculator Screen
-/// 
+///
 /// Finanzrechner für Zinseszins und Rentenlücke.
 
 library;
@@ -89,15 +89,19 @@ class _CompoundInterestCalculatorState
 
   void _calculate() {
     final calculator = ref.read(financialCalculatorProvider);
-    
-    final principal = double.tryParse(_principalController.text.replaceAll(',', '.')) ?? 0;
-    final rate = (double.tryParse(_rateController.text.replaceAll(',', '.')) ?? 0) / 100;
+
+    final principal =
+        double.tryParse(_principalController.text.replaceAll(',', '.')) ?? 0;
+    final rate =
+        (double.tryParse(_rateController.text.replaceAll(',', '.')) ?? 0) / 100;
     final years = int.tryParse(_yearsController.text) ?? 0;
-    final monthly = double.tryParse(_monthlyController.text.replaceAll(',', '.')) ?? 0;
+    final monthly =
+        double.tryParse(_monthlyController.text.replaceAll(',', '.')) ?? 0;
 
     if (principal <= 0 && monthly <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bitte Anfangskapital oder Sparrate eingeben')),
+        const SnackBar(
+            content: Text('Bitte Anfangskapital oder Sparrate eingeben')),
       );
       return;
     }
@@ -175,10 +179,12 @@ class _CompoundInterestCalculatorState
   }
 
   Widget _buildResultCard() {
-    final principal = double.tryParse(_principalController.text.replaceAll(',', '.')) ?? 0;
-    final monthly = double.tryParse(_monthlyController.text.replaceAll(',', '.')) ?? 0;
+    final principal =
+        double.tryParse(_principalController.text.replaceAll(',', '.')) ?? 0;
+    final monthly =
+        double.tryParse(_monthlyController.text.replaceAll(',', '.')) ?? 0;
     final years = int.tryParse(_yearsController.text) ?? 0;
-    
+
     final totalContributions = principal + (monthly * years * 12);
     final interest = _result! - totalContributions;
 
@@ -302,15 +308,22 @@ class _RetirementGapCalculatorState
     final calculator = ref.read(financialCalculatorProvider);
 
     final desiredIncome = double.tryParse(
-            _desiredIncomeController.text.replaceAll(',', '.')) ?? 0;
+          _desiredIncomeController.text.replaceAll(',', '.'),
+        ) ??
+        0;
     final expectedPension = double.tryParse(
-            _expectedPensionController.text.replaceAll(',', '.')) ?? 0;
+          _expectedPensionController.text.replaceAll(',', '.'),
+        ) ??
+        0;
     final yearsUntilRetirement =
         int.tryParse(_yearsUntilRetirementController.text) ?? 0;
     final retirementDuration =
         int.tryParse(_retirementDurationController.text) ?? 0;
     final inflation = (double.tryParse(
-                _inflationController.text.replaceAll(',', '.')) ?? 2) / 100;
+              _inflationController.text.replaceAll(',', '.'),
+            ) ??
+            2) /
+        100;
 
     setState(() {
       _neededCapital = calculator.calculateRetirementGap(
@@ -320,7 +333,7 @@ class _RetirementGapCalculatorState
         retirementDurationYears: retirementDuration,
         inflationRate: inflation,
       );
-      
+
       // Berechne die monatliche Lücke (heute)
       _monthlyGap = desiredIncome - expectedPension;
     });

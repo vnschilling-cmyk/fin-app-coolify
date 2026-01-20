@@ -1,5 +1,5 @@
 /// AdvisorMate - Dashboard Screen
-/// 
+///
 /// Übersicht aller Kundenportfolios und Marktdaten.
 
 library;
@@ -12,6 +12,7 @@ import 'package:advisor_mate/data/services/market_data_service.dart';
 import 'package:advisor_mate/presentation/providers/providers.dart';
 import 'package:advisor_mate/presentation/screens/client_detail_screen.dart';
 import 'package:advisor_mate/presentation/screens/client_form_screen.dart';
+import 'package:advisor_mate/presentation/screens/calculator_screen.dart';
 import 'package:advisor_mate/presentation/widgets/document_scan_widget.dart';
 
 /// Haupt-Dashboard für Finanzberater
@@ -94,11 +95,12 @@ class _MarketDataSection extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 100,
+          height: 120, // Increased from 100 to fix overflow
           child: indicesAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(
-              child: Text('Fehler: $e', style: const TextStyle(color: Colors.red)),
+              child:
+                  Text('Fehler: $e', style: const TextStyle(color: Colors.red)),
             ),
             data: (indices) => ListView.separated(
               scrollDirection: Axis.horizontal,
@@ -184,7 +186,10 @@ class _QuickActionsSection extends StatelessWidget {
                 icon: Icons.calculate,
                 label: 'Finanzrechner',
                 onTap: () {
-                  // TODO: Navigate to calculator
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CalculatorScreen()),
+                  );
                 },
               ),
             ),

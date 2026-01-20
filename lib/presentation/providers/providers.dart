@@ -1,5 +1,5 @@
 /// AdvisorMate - Riverpod Providers
-/// 
+///
 /// Zentrale Provider-Definitionen für State Management.
 
 library;
@@ -11,6 +11,9 @@ import 'package:advisor_mate/data/services/financial_calculator.dart';
 import 'package:advisor_mate/data/services/market_data_service.dart';
 import 'package:advisor_mate/domain/entities/client_entity.dart';
 import 'package:advisor_mate/core/encryption_utils.dart';
+import 'package:advisor_mate/core/constants.dart';
+import 'package:advisor_mate/data/repositories/client_repository_impl.dart';
+import 'package:advisor_mate/domain/repositories/client_repository.dart';
 
 // ========== SERVICES ==========
 
@@ -25,7 +28,7 @@ final authServiceProvider = Provider<AuthService>((ref) {
 });
 
 /// Database Service Provider
-/// 
+///
 /// Nutzt PocketBaseDatabaseService mit der URL aus den Konstanten.
 final databaseServiceProvider = Provider<ClientDatabaseService>((ref) {
   return PocketBaseDatabaseService(baseUrl: ApiConstants.pocketBaseUrl);
@@ -40,10 +43,6 @@ final financialCalculatorProvider = Provider<FinancialCalculator>((ref) {
 final marketDataServiceProvider = Provider<MarketDataService>((ref) {
   return MockMarketDataService();
 });
-
-import 'package:advisor_mate/data/repositories/client_repository_impl.dart';
-import 'package:advisor_mate/domain/repositories/client_repository.dart';
-
 // ========== REPOSITORIES ==========
 
 /// Client Repository Provider
@@ -73,7 +72,8 @@ final clientsProvider = FutureProvider<List<Client>>((ref) async {
 });
 
 /// Einzelner Kunde by ID
-final clientByIdProvider = FutureProvider.family<Client?, String>((ref, clientId) async {
+final clientByIdProvider =
+    FutureProvider.family<Client?, String>((ref, clientId) async {
   final dbService = ref.watch(databaseServiceProvider);
   return await dbService.getClientById(clientId);
 });
@@ -113,7 +113,8 @@ class ClientsNotifier extends AsyncNotifier<List<Client>> {
   }
 }
 
-final clientsNotifierProvider = AsyncNotifierProvider<ClientsNotifier, List<Client>>(() {
+final clientsNotifierProvider =
+    AsyncNotifierProvider<ClientsNotifier, List<Client>>(() {
   return ClientsNotifier();
 });
 
@@ -194,7 +195,8 @@ class CompoundInterestState {
 }
 
 final compoundInterestProvider =
-    StateNotifierProvider<CompoundInterestNotifier, CompoundInterestState>((ref) {
+    StateNotifierProvider<CompoundInterestNotifier, CompoundInterestState>(
+        (ref) {
   final calculator = ref.watch(financialCalculatorProvider);
   return CompoundInterestNotifier(calculator);
 });

@@ -1,5 +1,5 @@
 /// AdvisorMate - Database Service Abstraction
-/// 
+///
 /// Abstrakte Schnittstelle für Backend-Operationen.
 /// Ermöglicht einfachen Wechsel zwischen PocketBase, Supabase, Firebase, etc.
 
@@ -58,8 +58,8 @@ class PocketBaseDatabaseService implements ClientDatabaseService {
   @override
   Future<List<Client>> getAllClients() async {
     final records = await _pb.collection('clients').getFullList(
-      sort: '-created',
-    );
+          sort: '-created',
+        );
     return records.map((r) => _mapRecordToClient(r)).toList();
   }
 
@@ -83,7 +83,8 @@ class PocketBaseDatabaseService implements ClientDatabaseService {
   @override
   Future<Client> updateClient(Client client) async {
     final body = _mapClientToMap(client);
-    final record = await _pb.collection('clients').update(client.id, body: body);
+    final record =
+        await _pb.collection('clients').update(client.id, body: body);
     return _mapRecordToClient(record);
   }
 
@@ -95,8 +96,9 @@ class PocketBaseDatabaseService implements ClientDatabaseService {
   @override
   Future<List<Client>> searchClients(String query) async {
     final records = await _pb.collection('clients').getList(
-      filter: 'firstName ~ "$query" || lastName ~ "$query" || email ~ "$query"',
-    );
+          filter:
+              'firstName ~ "$query" || lastName ~ "$query" || email ~ "$query"',
+        );
     return records.items.map((r) => _mapRecordToClient(r)).toList();
   }
 
@@ -109,14 +111,19 @@ class PocketBaseDatabaseService implements ClientDatabaseService {
       lastName: record.getStringValue('lastName'),
       email: record.getStringValue('email'),
       dateOfBirth: DateTime.parse(record.getStringValue('dateOfBirth')),
-      financialBalance: _mapJsonToBalance(record.getDataValue<Map<String, dynamic>>('financialBalance') ?? {}),
-      liquidity: _mapJsonToLiquidity(record.getDataValue<Map<String, dynamic>>('liquidity') ?? {}),
+      financialBalance: _mapJsonToBalance(
+          record.getDataValue<Map<String, dynamic>>('financialBalance') ?? {}),
+      liquidity: _mapJsonToLiquidity(
+          record.getDataValue<Map<String, dynamic>>('liquidity') ?? {}),
       taxStatus: TaxStatus.fromApiValue(record.getStringValue('taxStatus')),
       riskProfile: record.getIntValue('riskProfile'),
-      investmentGoal: InvestmentGoal.fromApiValue(record.getStringValue('investmentGoal')),
-      experienceLevel: ExperienceLevel.fromApiValue(record.getStringValue('experienceLevel')),
+      investmentGoal:
+          InvestmentGoal.fromApiValue(record.getStringValue('investmentGoal')),
+      experienceLevel: ExperienceLevel.fromApiValue(
+          record.getStringValue('experienceLevel')),
       investmentHorizonYears: record.getIntValue('investmentHorizonYears', 10),
-      esgPreferences: _mapJsonToEsg(record.getDataValue<Map<String, dynamic>>('esgPreferences') ?? {}),
+      esgPreferences: _mapJsonToEsg(
+          record.getDataValue<Map<String, dynamic>>('esgPreferences') ?? {}),
       createdAt: DateTime.parse(record.created),
       updatedAt: DateTime.parse(record.updated),
     );
@@ -151,8 +158,21 @@ class PocketBaseDatabaseService implements ClientDatabaseService {
   FinancialBalance _mapJsonToBalance(Map<String, dynamic> json) {
     // In einer echten App würden hier die Details aus dem JSON gemappt werden
     return FinancialBalance(
-      assets: [Asset(id: '1', name: 'Gesamt', type: AssetType.cash, value: (json['totalAssets'] ?? 0).toDouble())],
-      liabilities: [Liability(id: '1', name: 'Gesamt', type: LiabilityType.other, amount: (json['totalLiabilities'] ?? 0).toDouble(), interestRate: 0)],
+      assets: [
+        Asset(
+            id: '1',
+            name: 'Gesamt',
+            type: AssetType.cash,
+            value: (json['totalAssets'] ?? 0).toDouble())
+      ],
+      liabilities: [
+        Liability(
+            id: '1',
+            name: 'Gesamt',
+            type: LiabilityType.other,
+            amount: (json['totalLiabilities'] ?? 0).toDouble(),
+            interestRate: 0)
+      ],
     );
   }
 
@@ -179,23 +199,25 @@ class MockDatabaseService implements ClientDatabaseService {
   @override
   Future<void> initialize() async {
     _isConnected = true;
-    _clients.add(Client(
-      id: 'mock-1',
-      firstName: 'Max (Mock)',
-      lastName: 'Mustermann',
-      email: 'max@example.com',
-      dateOfBirth: DateTime(1985, 5, 20),
-      financialBalance: const FinancialBalance.empty(),
-      liquidity: const Liquidity(monthlyIncome: 4500, monthlyExpenses: 3200),
-      taxStatus: TaxStatus.residentTaxable,
-      riskProfile: 6,
-      investmentGoal: InvestmentGoal.retirement,
-      experienceLevel: ExperienceLevel.intermediate,
-      investmentHorizonYears: 25,
-      esgPreferences: const EsgPreferences.none(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
+    _clients.add(
+      Client(
+        id: 'mock-1',
+        firstName: 'Max (Mock)',
+        lastName: 'Mustermann',
+        email: 'max@example.com',
+        dateOfBirth: DateTime(1985, 5, 20),
+        financialBalance: const FinancialBalance.empty(),
+        liquidity: const Liquidity(monthlyIncome: 4500, monthlyExpenses: 3200),
+        taxStatus: TaxStatus.residentTaxable,
+        riskProfile: 6,
+        investmentGoal: InvestmentGoal.retirement,
+        experienceLevel: ExperienceLevel.intermediate,
+        investmentHorizonYears: 25,
+        esgPreferences: const EsgPreferences.none(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 
   @override
@@ -243,8 +265,12 @@ class MockDatabaseService implements ClientDatabaseService {
   @override
   Future<List<Client>> searchClients(String query) async {
     final lowerQuery = query.toLowerCase();
-    return _clients.where((c) =>
-        c.fullName.toLowerCase().contains(lowerQuery) ||
-        c.email.toLowerCase().contains(lowerQuery)).toList();
+    return _clients
+        .where(
+          (c) =>
+              c.fullName.toLowerCase().contains(lowerQuery) ||
+              c.email.toLowerCase().contains(lowerQuery),
+        )
+        .toList();
   }
 }

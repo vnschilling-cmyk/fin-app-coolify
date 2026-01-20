@@ -1,5 +1,5 @@
 /// AdvisorMate - KYC Form Screen
-/// 
+///
 /// Multi-Step Formular zur Erfassung von KYC-Daten neuer Kunden.
 
 library;
@@ -59,7 +59,8 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
       _incomeController.text = c.liquidity.monthlyIncome.toString();
       _expensesController.text = c.liquidity.monthlyExpenses.toString();
       _assetsController.text = c.financialBalance.totalAssets.toString();
-      _liabilitiesController.text = c.financialBalance.totalLiabilities.toString();
+      _liabilitiesController.text =
+          c.financialBalance.totalLiabilities.toString();
       _riskProfile = c.riskProfile;
       _goal = c.investmentGoal;
       _experience = c.experienceLevel;
@@ -85,14 +86,28 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final newClient = Client(
-      id: widget.initialClient?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.initialClient?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       firstName: _firstNameController.text,
       lastName: _lastNameController.text,
       email: _emailController.text,
       dateOfBirth: _dateOfBirth,
       financialBalance: FinancialBalance(
-        assets: [Asset(id: '1', name: 'Gesamtvermögen', type: AssetType.cash, value: double.parse(_assetsController.text))],
-        liabilities: [Liability(id: '1', name: 'Verbindlichkeiten', type: LiabilityType.other, amount: double.parse(_liabilitiesController.text), interestRate: 0)],
+        assets: [
+          Asset(
+              id: '1',
+              name: 'Gesamtvermögen',
+              type: AssetType.cash,
+              value: double.parse(_assetsController.text))
+        ],
+        liabilities: [
+          Liability(
+              id: '1',
+              name: 'Verbindlichkeiten',
+              type: LiabilityType.other,
+              amount: double.parse(_liabilitiesController.text),
+              interestRate: 0)
+        ],
       ),
       liquidity: Liquidity(
         monthlyIncome: double.parse(_incomeController.text),
@@ -113,10 +128,11 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
 
     // Save via Provider
     await ref.read(clientsNotifierProvider.notifier).addClient(newClient);
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kunde erfolgreich gespeichert (verschlüsselt)')),
+        const SnackBar(
+            content: Text('Kunde erfolgreich gespeichert (verschlüsselt)')),
       );
       Navigator.pop(context);
     }
@@ -126,7 +142,9 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialClient == null ? 'Neuer Kunde (KYC)' : 'KYC bearbeiten'),
+        title: Text(widget.initialClient == null
+            ? 'Neuer Kunde (KYC)'
+            : 'KYC bearbeiten'),
       ),
       body: Form(
         key: _formKey,
@@ -235,15 +253,21 @@ class _ClientFormScreenState extends ConsumerState<ClientFormScreen> {
         const SizedBox(height: 16),
         const Text('Anlageziel'),
         DropdownButtonFormField<InvestmentGoal>(
-          value: _goal,
-          items: InvestmentGoal.values.map((g) => DropdownMenuItem(value: g, child: Text(g.displayName))).toList(),
+          initialValue: _goal,
+          items: InvestmentGoal.values
+              .map(
+                  (g) => DropdownMenuItem(value: g, child: Text(g.displayName)))
+              .toList(),
           onChanged: (v) => setState(() => _goal = v!),
         ),
         const SizedBox(height: 16),
         const Text('Erfahrungshorizont'),
         DropdownButtonFormField<ExperienceLevel>(
-          value: _experience,
-          items: ExperienceLevel.values.map((e) => DropdownMenuItem(value: e, child: Text(e.displayName))).toList(),
+          initialValue: _experience,
+          items: ExperienceLevel.values
+              .map(
+                  (e) => DropdownMenuItem(value: e, child: Text(e.displayName)))
+              .toList(),
           onChanged: (v) => setState(() => _experience = v!),
         ),
       ],

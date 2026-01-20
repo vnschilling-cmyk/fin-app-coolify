@@ -1,5 +1,5 @@
 /// AdvisorMate - Client Entity
-/// 
+///
 /// Haupt-Datenmodell für Kunden mit allen KYC-Informationen.
 /// Enthält harte Fakten, weiche Fakten und ESG-Präferenzen.
 
@@ -65,9 +65,9 @@ class EsgPreferences {
 }
 
 /// Kundeninformationen für die Finanzberatung
-/// 
+///
 /// DSGVO-HINWEIS: Diese Klasse enthält umfangreiche personenbezogene Daten.
-/// Alle Felder mit [SensitiveData] Annotation müssen verschlüsselt 
+/// Alle Felder mit [SensitiveData] Annotation müssen verschlüsselt
 /// gespeichert werden.
 class Client {
   /// Eindeutige Kunden-ID
@@ -96,12 +96,12 @@ class Client {
   // ========== HARTE FAKTEN ==========
 
   /// Vermögensbilanz (Assets vs. Liabilities)
-  /// 
+  ///
   /// // ENCRYPTED: Enthält alle Vermögenswerte und Verbindlichkeiten
   final FinancialBalance financialBalance;
 
   /// Liquidität (Einnahmen/Ausgaben)
-  /// 
+  ///
   /// // ENCRYPTED: Enthält Einkommens- und Ausgabendaten
   final Liquidity liquidity;
 
@@ -165,8 +165,10 @@ class Client {
     required this.updatedAt,
     this.advisorId,
     this.notes,
-  }) : assert(riskProfile >= 1 && riskProfile <= 10,
-            'Risikoprofil muss zwischen 1 und 10 liegen');
+  }) : assert(
+          riskProfile >= 1 && riskProfile <= 10,
+          'Risikoprofil muss zwischen 1 und 10 liegen',
+        );
 
   /// Vollständiger Name
   String get fullName => '$firstName $lastName';
@@ -250,5 +252,6 @@ class Client {
   }
 
   @override
-  String toString() => 'Client($fullName, Net Worth: ${netWorth.toStringAsFixed(2)} EUR)';
+  String toString() =>
+      'Client($fullName, Net Worth: ${netWorth.toStringAsFixed(2)} EUR)';
 }

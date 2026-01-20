@@ -1,5 +1,5 @@
 /// AdvisorMate - Client Detail Screen
-/// 
+///
 /// Übersichtliche Darstellung aller KYC-Daten eines Kunden.
 /// Aufgeteilt in Abschnitte: Finanzdaten, Risikoprofil, ESG-Präferenzen.
 
@@ -304,7 +304,7 @@ class _ClientDetailView extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    left: ((client.riskProfile - 1) / 9) * 
+                    left: ((client.riskProfile - 1) / 9) *
                         (MediaQuery.of(context).size.width - 150),
                     child: Container(
                       width: 16,
@@ -330,7 +330,8 @@ class _ClientDetailView extends StatelessWidget {
         const SizedBox(height: 8),
         _buildKeyValueRow('Risikotyp', client.riskProfileText),
         const Divider(),
-        _buildKeyValueRow('Primäres Anlageziel', client.investmentGoal.displayName),
+        _buildKeyValueRow(
+            'Primäres Anlageziel', client.investmentGoal.displayName),
         _buildKeyValueRow(
           'Anlagehorizont',
           '${client.investmentHorizonYears} Jahre',
@@ -345,7 +346,7 @@ class _ClientDetailView extends StatelessWidget {
 
   Widget _buildEsgSection(BuildContext context) {
     final esg = client.esgPreferences;
-    
+
     if (!esg.hasPreference) {
       return const Text(
         'Keine ESG-Präferenzen angegeben',
@@ -386,10 +387,12 @@ class _ClientDetailView extends StatelessWidget {
             spacing: 8,
             runSpacing: 4,
             children: esg.exclusionCriteria
-                .map((c) => Chip(
-                      label: Text(c, style: const TextStyle(fontSize: 12)),
-                      backgroundColor: Colors.red[100],
-                    ))
+                .map(
+                  (c) => Chip(
+                    label: Text(c, style: const TextStyle(fontSize: 12)),
+                    backgroundColor: Colors.red[100],
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -427,7 +430,7 @@ class _ClientDetailView extends StatelessWidget {
 
   Widget _buildAssetAllocationSection(BuildContext context) {
     final allocation = client.financialBalance.assetAllocationPercent;
-    
+
     if (allocation.isEmpty) {
       return const Text(
         'Keine Assets vorhanden',

@@ -1,5 +1,5 @@
 /// AdvisorMate - Biometric Authentication Guard
-/// 
+///
 /// Wrapper-Widget das biometrische Authentifizierung erfordert
 /// bevor der Inhalt angezeigt wird.
 
@@ -7,13 +7,12 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:advisor_mate/data/services/auth_service.dart';
 import 'package:advisor_mate/core/errors.dart';
 import 'package:advisor_mate/core/constants.dart';
 import 'package:advisor_mate/presentation/providers/providers.dart';
 
 /// Guard-Widget für biometrische Authentifizierung
-/// 
+///
 /// Zeigt einen Authentifizierungs-Screen an, bis der Benutzer
 /// sich erfolgreich per FaceID/TouchID authentifiziert hat.
 class BiometricAuthGuard extends ConsumerStatefulWidget {
@@ -38,7 +37,7 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+
     // Starte Authentifizierung nach dem ersten Frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (FeatureFlags.biometricAuthEnabled) {
@@ -58,7 +57,7 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Re-authentifizieren wenn App aus dem Hintergrund kommt
-    if (state == AppLifecycleState.resumed && 
+    if (state == AppLifecycleState.resumed &&
         _isAuthenticated &&
         FeatureFlags.biometricAuthEnabled) {
       // Optional: Re-auth nach bestimmter Zeit im Hintergrund
@@ -77,7 +76,8 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
     try {
       final authService = ref.read(authServiceProvider);
       final success = await authService.authenticateWithBiometrics(
-        reason: 'Bitte authentifizieren Sie sich für den Zugriff auf AdvisorMate',
+        reason:
+            'Bitte authentifizieren Sie sich für den Zugriff auf AdvisorMate',
       );
 
       if (success) {
@@ -129,7 +129,7 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 Text(
                   AppConfig.appName,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -137,7 +137,7 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
                       ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Sicherer Zugang für Finanzberater',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -201,12 +201,14 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
                       // Fallback: PIN/Passwort
                       try {
                         final authService = ref.read(authServiceProvider);
-                        final success = await authService.authenticateWithFallback(
+                        final success =
+                            await authService.authenticateWithFallback(
                           reason: 'Bitte geben Sie Ihren Geräte-PIN ein',
                         );
                         if (success) {
                           setState(() => _isAuthenticated = true);
-                          ref.read(isAuthenticatedProvider.notifier).state = true;
+                          ref.read(isAuthenticatedProvider.notifier).state =
+                              true;
                         }
                       } catch (e) {
                         setState(() {
@@ -219,7 +221,7 @@ class _BiometricAuthGuardState extends ConsumerState<BiometricAuthGuard>
                 ],
 
                 const SizedBox(height: 48),
-                
+
                 // Security Hinweis
                 Container(
                   padding: const EdgeInsets.all(16),
